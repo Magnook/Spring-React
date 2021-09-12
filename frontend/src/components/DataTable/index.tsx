@@ -6,6 +6,7 @@ import { formatLocalDate } from "utils/format"
 import Pagination from "components/Pagination";
 const DataTable = () => {
 
+    const [activePage, setActivePage] = useState(0);
     const [page, setPage] = useState<SalePage>({
         first: true,
         last: true,
@@ -15,15 +16,18 @@ const DataTable = () => {
     });
 
     useEffect(() => {
-        axios.get(`${BASE_URL}/sales?page=0&size=0&sort=date,desc`)
+        axios.get(`${BASE_URL}/sales?page=${activePage}&size=10&sort=date,desc`)
             .then(response => {
                 setPage(response.data);
             });
-    }, []);
+    }, [activePage]);
 
+    const changePage = (index: number) => {
+        setActivePage(index);
+    }
     return (
         <>
-            <Pagination />
+            <Pagination page={page} onPageChange={changePage} />
             <div className="table-responsive">
                 <table className="table table-striped table-sm">
                     <thead>
@@ -37,7 +41,7 @@ const DataTable = () => {
                     </thead>
                     <tbody>
                         {page.content?.map(item => (
-                            <tr  key={item.id}>
+                            <tr key={item.id}>
                                 <td>{formatLocalDate(item.date, "dd/MM/yyyy")}</td>
                                 <td>{item.seller.name}</td>
                                 <td>{item.visited}</td>
